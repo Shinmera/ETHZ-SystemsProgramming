@@ -1,49 +1,61 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char* argv[])
-{
-    FILE *fp = NULL;
-    int nfiles = --argc; /*ignore the name of the program itself*/
-    int argidx = 1; /*ignore the name of the program itself*/
-    char *currfile = "";
-    char c;
-    /*count of words,lines,characters*/
-    unsigned long nw = 0, nl = 0, nc = 0;
+// tsk tsk tsk, the example code
+// is not even closing the FDs.
 
-    if (nfiles == 0)
-    {
-        fp = stdin; /*standard input*/
-        nfiles++;
+int is_linebreak(char c){
+  return (c == '\n'
+          || c == '\r');
+}
+
+int is_whitespace(char c){
+  return (c == ' '
+          || is_linebreak(c)
+          || c == '\t'
+          || c == '\v');
+}
+
+int main(int argc, char* argv[]){
+  FILE *file_pointer = NULL;
+  int file_count = --argc;
+  int arg_counter = 1;
+  char *current_file = "";
+
+  if(file_count == 0){
+    file_pointer = stdin;
+    file_count++;
+  }else{
+    current_file = argv[arg_counter++];
+    file_pointer = fopen(current_file, "r");
+  }
+    
+  while(file_count > 0){
+    if(file_pointer == NULL){
+      fprintf(stderr, "Unable to open input\n");
+      exit(-1);
     }
-    else /*set to first*/
-    {
-        currfile = argv[argidx++];
-        fp = fopen(currfile, "r");
+
+    unsigned long characters=0, words=0, lines=0;
+    char c='\0', prev='\0';
+    while((c = getc(file_pointer)) != EOF){
+      ++characters;
+      if(is_linebreak(c)) ++lines;
+      if(!is_whitespace(prev)
+         && is_whitespace(c))
+        ++words;
+      prev = c;
     }
-    while (nfiles > 0) /*files left >0*/
-    {
-        if (fp == NULL)
-        {
-            fprintf(stderr, "Unable to open input\n");
-            exit(-1);
-        }
-        nc = nw = nl = 0;
-        while ((c = getc(fp)) != EOF)
-        {
-            /*TODO:FILL HERE
-             process the file using getc(fp)
-             */
-        }
-        /*print totals*/
-        printf("%ld %ld %ld %s\n", nl, nw, nc, currfile);
-        /*next file if exists*/
-        nfiles--;
-        if (nfiles > 0)
-        {
-            currfile = argv[argidx++];
-            fp = fopen(currfile, "r");
-        }
+    // Make sure to count the last one.
+    if(prev != '\0' && !is_whitespace(prev))++words;
+
+    printf("%ld %ld %ld %s\n", lines, words, characters, current_file);
+    
+    file_count--;
+    if (file_count > 0){
+      current_file = argv[arg_counter++];
+      file_pointer = fopen(current_file, "r");
     }
-    return 0;
+  }
+  return 0;
 }
