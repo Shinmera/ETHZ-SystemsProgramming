@@ -8,7 +8,7 @@
 
 // According to http://www.cse.yorku.ca/~oz/hash.html
 
-int compute_hash(const char* key, int size){
+int compute_hash(const char *key, int size){
   unsigned long hash = 5381;
   int c;
   
@@ -22,8 +22,8 @@ int compute_hash(const char* key, int size){
 }
 
 
-struct hash_elem* pop(struct hash_elem** bucket){
-  struct hash_elem* current = *bucket;
+struct hash_elem *pop(struct hash_elem **bucket){
+  struct hash_elem *current = *bucket;
   
   if(current == NULL)
     return NULL;
@@ -33,7 +33,7 @@ struct hash_elem* pop(struct hash_elem** bucket){
   return current;
 }
 
-void push(struct hash_elem* elem, struct hash_elem** bucket){
+void push(struct hash_elem *elem, struct hash_elem **bucket){
   elem->next = *bucket;
   *bucket = elem;
 }
