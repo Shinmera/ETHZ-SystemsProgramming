@@ -21,6 +21,10 @@ struct ccodes {
   char cf, zf, sf, of;
 };
 
+char int_bit(char pos, reg_flags_t eflags){
+  return (eflags & ( 1 << pos )) >> pos;
+}
+
 /* Extract the CF, ZF, SF, and OF condition codes from the
    contents of the EFLAGS register passed in as an argument. */
 struct ccodes getccodes(reg_flags_t eflags)
@@ -41,16 +45,16 @@ struct ccodes getccodes(reg_flags_t eflags)
 
   // Extract the carry flag from eflags such that bit 0 of ccodes.cf
   // correspond to the value of the carry flag.
-  ccodes.cf = 0;
+  ccodes.cf = int_bit(0, eflags);
 
   // Extract the zero flag from eflags.
-  ccodes.zf = 0;
+  ccodes.zf = int_bit(6, eflags);
 
   // Extract the sign flag from eflags.
-  ccodes.sf = 0;
+  ccodes.sf = int_bit(7, eflags);
 
   // Extract the overflow flag from eflags.
-  ccodes.of = 0;
+  ccodes.of = int_bit(11, eflags);
 
   /********************************************************************
    * END EDITING
